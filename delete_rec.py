@@ -4,74 +4,47 @@ from selenium.webdriver.common.keys import Keys
 import time
 import config
 
-#Google acc info
-usr = config.usr 
-pw = config.pw
+def cycle():
+    try:
+        # Google acc info. Create your own config file
+        usr = config.usr 
+        pw = config.pw
 
-#Log in to google account
-print('Logging into account`')
-driver = webdriver.Chrome()
-driver.get('https://www.keep.google.com')
-time.sleep(1)
-elem = driver.find_element_by_id('identifierId')
-elem.send_keys(usr + Keys.ENTER)
-time.sleep(1)
-elem = driver.find_element_by_name('password')
-elem.send_keys(pw + Keys.ENTER)
-driver.find_element_by_class_name('RveJvd').click()
+        #Log in to google account
+        driver = webdriver.Chrome()
+        driver.get('https://youtube.com')
+        time.sleep(3)
+        driver.find_element_by_xpath('//*[@id="text"]').click()
+        time.sleep(1)
+        elem = driver.find_element_by_id('identifierId')
+        elem.send_keys(usr + Keys.ENTER)
+        time.sleep(1)
+        elem = driver.find_element_by_name('password')
+        elem.send_keys(pw + Keys.ENTER)
 
-time.sleep(5)
-driver.find_element_by_xpath('//*[@id="gb"]/div[2]/div[2]/div[3]/div[2]').click() #Switch from Grid to List view
+        time.sleep(3)
 
-#Scroll to bottom to load all notes
-print('Loading all notes')
-time.sleep(3)
-lenOfPage = driver.execute_script("window.scrollTo(0,document.body.scrollHeight);"
-                                + "var lenOfPage=document.body.scrollHeight;return lenOfPage;")
-match=False
-while(match==False):
-    lastCount = lenOfPage
-    time.sleep(3)
-    lenOfPage = driver.execute_script("window.scrollTo(0, document.body.scrollHeight);" 
-                                    + "var lenOfPage=document.body.scrollHeight;return lenOfPage;")
-    if lastCount==lenOfPage:
-        match=True
+        # Get all thumbnail elements
+        thumbnails = driver.find_elements_by_xpath('//*[@id="img"]')
 
-#Get text of every note
-print('Getting note text')
-divs = driver.find_elements_by_css_selector('div')
-all_divs = []
-for div in divs:
-    if "notranslate" in div.get_attribute("class") and len(div.text.encode('utf-8')) > 0:
-        all_divs.append(div)
+        # When a video thumbnail is hovered over, a button appears which allows you to indicate 
+        # "Not Interested" to delete that video from your recommendations
+        # This function finds that element
+        def tiny():
+            elems = driver.find_elements_by_xpath('//*[@id="button"]/yt-icon')
+            for elem in elems:
+                if "ytd-menu-renderer" in elem.get_attribute('class') and elem.size['height'] != 0:
+                    return elem
 
-del all_divs[0]
-all_test = []
-for div in all_divs:
-    if 'CmABtb' in div.get_attribute('class') or 'r4nke' in div.get_attribute('class'):
-        all_test.append('~!&^%!%' + div.text.encode('utf-8')) 
-    else:
-        all_test.append(div.text.encode('utf-8'))
+        for i in range(1,9):
+            elems = driver.find_elements_by_xpath('//*[@id="button"]/yt-icon')
+            ActionChains(driver).move_to_element(thumbnails[i]).move_to_element(tiny()).click().perform()
+            time.sleep(.2)
+            driver.find_element_by_xpath('//*[@id="items"]/div/ytd-menu-service-item-renderer[1]/yt-formatted-string').click()
 
-#Write notes to a newly made google doc
-print('Writing notes to new google doc')
-driver.get('https://docs.google.com/document/create')
-actions = ActionChains(driver)
-for test in all_test:
-    if '~!&^%!%' in test:
-        actions.send_keys(test[8:])
-        actions.send_keys(Keys.ENTER)
-    else:
-        actions.send_keys(test)
-        actions.send_keys(Keys.ENTER + '------------------------------------' + Keys.ENTER)
+        driver.quit()
+    except:
+        driver.quit()
 
-actions.perform()
-
-
-elem = driver.find_element_by_css_selector('#docs-title-widget > input')
-elem.send_keys('Google Keep notes' + Keys.ENTER)
-
-print('waiting')
-time.sleep(5)
-
-driver.quit()
+for i in range(10):
+    cycle()
