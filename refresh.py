@@ -24,9 +24,6 @@ def cycle():
 
         time.sleep(3)
 
-        # Get all thumbnail elements
-        thumbnails = driver.find_elements_by_xpath('//*[@id="img"]')
-
         # When a video thumbnail is hovered over, a button appears which allows you to indicate 
         # "Not Interested" to delete that video from your recommendations
         # This function finds that element
@@ -36,15 +33,26 @@ def cycle():
                 if "ytd-menu-renderer" in elem.get_attribute('class') and elem.size['height'] != 0:
                     return elem
 
-        for i in range(1,9):
-            elems = driver.find_elements_by_xpath('//*[@id="button"]/yt-icon')
-            ActionChains(driver).move_to_element(thumbnails[i]).move_to_element(tiny()).click().perform()
-            time.sleep(.2)
-            driver.find_element_by_xpath('//*[@id="items"]/div/ytd-menu-service-item-renderer[1]/yt-formatted-string').click()
+        def cycle2():
+            # Get all thumbnail elements
+            thumbnails = driver.find_elements_by_xpath('//*[@id="img"]')
+
+            for i in range(1,9):
+                elems = driver.find_elements_by_xpath('//*[@id="button"]/yt-icon')
+                ActionChains(driver).move_to_element(thumbnails[i]).move_to_element(tiny()).click().perform()
+                time.sleep(.2)
+                driver.find_element_by_xpath('//*[@id="items"]/div/ytd-menu-service-item-renderer[1]/yt-formatted-string').click()
+
+        for i in range(10):
+            cycle2()
+            driver.get('https://youtube.com')
 
         driver.quit()
+
     except:
         driver.quit()
 
 for i in range(100):
     cycle()
+
+
