@@ -13,7 +13,7 @@ def cycle():
         #Log in to google account
         driver = webdriver.Chrome()
         driver.get('https://youtube.com')
-        time.sleep(3)
+        time.sleep(4)
         driver.find_element_by_xpath('//*[@id="text"]').click()
         time.sleep(1)
         elem = driver.find_element_by_id('identifierId')
@@ -40,8 +40,29 @@ def cycle():
             for i in range(1,9):
                 elems = driver.find_elements_by_xpath('//*[@id="button"]/yt-icon')
                 ActionChains(driver).move_to_element(thumbnails[i]).move_to_element(tiny()).click().perform()
-                time.sleep(.2)
+                time.sleep(.5)
+                # Click "Not Interested"
                 driver.find_element_by_xpath('//*[@id="items"]/div/ytd-menu-service-item-renderer[1]/yt-formatted-string').click()
+
+            elems = driver.find_elements_by_xpath("//*[contains(text(), 'Tell us why')]")
+            for elem in elems:
+                try:
+                    elem.click()
+                    driver.find_element_by_xpath("//*[contains(text(), 'watched the video')]").click()
+                    driver.find_element_by_xpath("//*[contains(text(), 'like the video')]").click()
+                    driver.find_element_by_xpath("//*[contains(text(), 'in this channel')]").click()
+                    driver.find_element_by_xpath("//*[contains(text(), 'based on')]").click()
+                except:
+                    # try:
+                    #     driver.find_element_by_xpath("//*[contains(text(), 'Submit')]").click()
+                    # except:
+                    #     continue
+                    continue
+
+                time.sleep(.5)
+
+                driver.find_element_by_xpath("//*[contains(text(), 'Submit')]").click()
+
 
         for i in range(10):
             cycle2()
@@ -52,7 +73,7 @@ def cycle():
     except:
         driver.quit()
 
-for i in range(100):
+while True:
     cycle()
 
 
